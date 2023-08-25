@@ -1,5 +1,5 @@
 -- Panda Key System
-local PandaAuth = loadstring(game:HttpGet("https://pandadevelopment.net/service_api/PandaBetaLib.lua"))()
+local PandaKey = loadstring(game:HttpGet("https://pandadevelopment.net/service_api/PandaBetaLib.lua"))()
 
 -- Services
 local TweenService = game:GetService("TweenService")
@@ -5989,7 +5989,7 @@ Library:Popup({
 	Options = {"Copy", "Close"}, -- Table
 	Callback = function(option)
 		if option == "Copy" then
-            setclipboard(PandaAuth:GetLink("vibehub"))
+            setclipboard(PandaKey:GetLink("vibehub"))
         end
 	end,
 })
