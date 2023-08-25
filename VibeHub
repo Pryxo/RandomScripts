@@ -1,3 +1,6 @@
+-- Panda Key System
+local PandaAuth = loadstring(game:HttpGet("https://pandadevelopment.net/service_api/PandaBetaLib.lua"))()
+
 -- Services
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -11,12 +14,6 @@ local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local ConnectionBin = {}
 local ControlsConnectionBin = {}
-
-
--- Panda Key System
-
-local PandaAuth = loadstring(game:HttpGet('https://pandadevelopment.net/service_api/PandaBetaLib.lua'))()
-setclipboard(PandaAuth:GetLink("vibehub"))
 
 -- Var
 local ThemeInstances = {
