@@ -1424,7 +1424,7 @@ Key: Click on Copy when Executing the script!]]
 								local keyEntered = KeySystem["a4"]["Text"]
 
 								if keyEntered ~= "" then
-									if loadstring(game:HttpGet(('https://pandadevelopment.net/service_api/PandaBetaLib.lua')))():ValidateKey("vibehub", keyEntered) then
+									if loadstring(game:HttpGet('https://pandadevelopment.net/service_api/PandaBetaLib.lua'))():ValidateKey("vibehub", keyEntered) then
 										KeySystem.CorrectKey = true
 
 										Library:ForceNotify({
