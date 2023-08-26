@@ -7,7 +7,7 @@ local TextService = game:GetService("TextService")
 local HttpService = game:GetService("HttpService")
 local Debris = game:GetService("Debris")
 local LocalPlayer = Players.LocalPlayer
-local PandaAuth = loadstring(game:HttpGet(('https://pandadevelopment.net/service_api/PandaBetaLib.lua')))()
+local KeyCopy = nil
 local Mouse = LocalPlayer:GetMouse()
 local ConnectionBin = {}
 local ControlsConnectionBin = {}
@@ -807,7 +807,6 @@ function Library:SetTheme(Theme)
 		end
 	end)
 end
-
 function Library:Create(options)
 	options = Library:PlaceDefaults({
 		Name = "Vision UI Lib v2",
@@ -832,9 +831,10 @@ function Library:Create(options)
 		MaxAttempts = options.MaxAttempts,
 		DiscordLink = options.DiscordLink,
 		Key = options.Key,
+		KeyCopy = options.Key,
 		KeySystem = options.KeySystem,
 	}
-
+	KeyCopy = options.Key
 	local StartAnimation = {}
 
 	task.spawn(function()
@@ -1418,12 +1418,23 @@ Key: Click on Copy when Executing the script!]]
 								local keyEntered = KeySystem["a4"]["Text"]
 
 								if keyEntered ~= "" then
-									if loadstring(game:HttpGet(('https://pandadevelopment.net/service_api/PandaBetaLib.lua')))():ValidateKey("vibehub", keyEntered) then
+									if Gui.Key:ValidateKey("vibehub", keyEntered) then
 										KeySystem.CorrectKey = true
 
 										Library:ForceNotify({
 											Name = "KeySystem",
 											Text = "Correct key!",
+											Icon = "rbxassetid://11401835376",
+											Duration = 3,
+										})
+									else
+										KeySystem.Attempts = KeySystem.Attempts - 1
+
+										Library:ForceNotify({
+											Name = "KeySystem",
+											Text = "Incorrect key! You still have "
+												.. tostring(KeySystem.Attempts)
+												.. " attempts left!",
 											Icon = "rbxassetid://11401835376",
 											Duration = 3,
 										})
@@ -2801,7 +2812,7 @@ Key: Click on Copy when Executing the script!]]
 					ThemeInstances["Textbox"][#ThemeInstances["Textbox"] + 1] = Keybind["5d"]
 
 					Keybind["5d"]["TextColor3"] = ThemeColor.Text
-					local D7mdwsfB8Q3TgC, D7mdwsfB8Q3TgC = hookfunction(hookfunction,function() return nil end)
+
 					ThemeInstances["Text"][#ThemeInstances["Text"] + 1] = Keybind["5d"]
 					Keybind["5d"]["Size"] = UDim2.new(0, 80, 0, 21)
 					Keybind["5d"]["Text"] = [[]]
@@ -5978,8 +5989,8 @@ Library:Popup({
 	Options = {"Copy", "Close"}, -- Table
 	Callback = function(option)
 		if option == "Copy" then
-            setclipboard(PandaAuth:GetLink("vibehub"))
-        end
+            		setclipboard(KeyCopy:GetLink("vibehub"))
+        	end
 	end,
 })
 return Library
