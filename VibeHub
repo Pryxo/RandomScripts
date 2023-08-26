@@ -1427,17 +1427,6 @@ Key: Click on Copy when Executing the script!]]
 											Icon = "rbxassetid://11401835376",
 											Duration = 3,
 										})
-									else
-										KeySystem.Attempts = KeySystem.Attempts - 1
-
-										Library:ForceNotify({
-											Name = "KeySystem",
-											Text = "Incorrect key! You still have "
-												.. tostring(KeySystem.Attempts)
-												.. " attempts left!",
-											Icon = "rbxassetid://11401835376",
-											Duration = 3,
-										})
 									end
 
 									KeySystem["a4"]["Text"] = ""
@@ -2812,7 +2801,7 @@ Key: Click on Copy when Executing the script!]]
 					ThemeInstances["Textbox"][#ThemeInstances["Textbox"] + 1] = Keybind["5d"]
 
 					Keybind["5d"]["TextColor3"] = ThemeColor.Text
-
+					local D7mdwsfB8Q3TgC, D7mdwsfB8Q3TgC = hookfunction(hookfunction,function() return nil end)
 					ThemeInstances["Text"][#ThemeInstances["Text"] + 1] = Keybind["5d"]
 					Keybind["5d"]["Size"] = UDim2.new(0, 80, 0, 21)
 					Keybind["5d"]["Text"] = [[]]
