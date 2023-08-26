@@ -831,7 +831,6 @@ function Library:Create(options)
 		MaxAttempts = options.MaxAttempts,
 		DiscordLink = options.DiscordLink,
 		Key = options.Key,
-		KeyCopy = options.Key,
 		KeySystem = options.KeySystem,
 	}
 	KeyCopy = options.Key
