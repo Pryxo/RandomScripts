@@ -5247,10 +5247,8 @@ Key: Click on Copy when Executing the script!]]
 	do
 		task.spawn(function()
 			while wait() do
-				local t = tick()
-				local sec = math.floor(t % 60)
-				local min = math.floor((t / 60) % 60)
-				local hour = math.floor((t / 3600) % 24)
+				local playerTime = os.date("*t", os.time())
+				local hour, min, sec = playerTime.hour, playerTime.min, playerTime.sec
 
 				if string.len(sec) < 2 then
 					sec = "0" .. tostring(sec)
