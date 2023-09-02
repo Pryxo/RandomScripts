@@ -1412,9 +1412,11 @@ function Library:Create(options)
 							end)
 						)
 						local SavedKey = KeyCopy:LoadKey("VibeHubKey.txt")
-						if Gui.Key:ValidateKey("vibehub", SavedKey) then
-							print("Input Key: "..SavedKey)
-							KeySystem.CorrectKey = true
+						if isfile("VibeHubKey.txt") then
+							if Gui.Key:ValidateKey("vibehub", SavedKey) then
+								print("Input Key: "..SavedKey)
+								KeySystem.CorrectKey = true
+							end
 						end
 						table.insert(
 							KeyConnectionBin,
