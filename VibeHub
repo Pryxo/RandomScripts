@@ -807,6 +807,7 @@ function Library:SetTheme(Theme)
 		end
 	end)
 end
+
 function Library:Create(options)
 	options = Library:PlaceDefaults({
 		Name = "Vision UI Lib v2",
@@ -1015,7 +1016,7 @@ function Library:Create(options)
 		local ChildOffset = 0
 
 		for i, v in pairs(Gui["6"]:GetChildren()) do
-			if v:IsA("Frame") then
+			if v:IsA("TextButton") then
 				NumChild = NumChild + 1
 				ChildOffset = ChildOffset + v.Size.X.Offset
 			end
@@ -1367,9 +1368,9 @@ function Library:Create(options)
 
 					KeySystem["a9"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
 					KeySystem["a9"]["Size"] = UDim2.new(0.949999988079071, 0, 0.800000011920929, 0)
-					KeySystem["a9"]["Text"] = [[Note: Join our Discord for Updates & Bug Reporting!
-
-Key: Click on Copy when Executing the script!]]
+					KeySystem["a9"]["Text"] = "Note: Join our Discord for Updates & Bug Reporting!\n"..
+											  "Discord: discord.gg/vkxAThAbz6\n"..
+											  "Key: Click on Copy when Executing the script!"
 					KeySystem["a9"]["Font"] = Enum.Font.Gotham
 					KeySystem["a9"]["BackgroundTransparency"] = 1
 					KeySystem["a9"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
@@ -1410,14 +1411,19 @@ Key: Click on Copy when Executing the script!]]
 								KeySystem.KeyTextboxHover = false
 							end)
 						)
-
+						local SavedKey = KeyCopy:LoadKey("VibeHubKey.txt")
+						if Gui.Key:ValidateKey("vibehub", SavedKey) then
+							print("Input Key: "..SavedKey)
+							KeySystem.CorrectKey = true
+						end
 						table.insert(
 							KeyConnectionBin,
 							KeySystem["a4"].FocusLost:Connect(function()
 								local keyEntered = KeySystem["a4"]["Text"]
-
 								if keyEntered ~= "" then
-									if Gui.Key:ValidateKey("vibehub", keyEntered) then
+									print("Input Key: "..keyEntered)
+									if Gui.Key:ValidateKey("vibehub", keyEntered)then
+										Gui.Key:SaveKey("VibeHubKey.txt",tostring(keyEntered))
 										KeySystem.CorrectKey = true
 
 										Library:ForceNotify({
@@ -1427,13 +1433,9 @@ Key: Click on Copy when Executing the script!]]
 											Duration = 3,
 										})
 									else
-										KeySystem.Attempts = KeySystem.Attempts - 1
-
 										Library:ForceNotify({
 											Name = "KeySystem",
-											Text = "Incorrect key! You still have "
-												.. tostring(KeySystem.Attempts)
-												.. " attempts left!",
+											Text = "Incorrect key!",
 											Icon = "rbxassetid://11401835376",
 											Duration = 3,
 										})
@@ -3690,7 +3692,7 @@ Key: Click on Copy when Executing the script!]]
 							else
 								for i, v in pairs(Dropdown["4b"]:GetChildren()) do
 									if v:IsA("Frame") then
-										if string.find(v.Name, Dropdown["5e"].Text) then
+										if string.find(string.lower(v.Name), string.lower(Dropdown["5e"].Text)) then
 											v.Visible = true
 										else
 											v.Visible = false
@@ -5982,7 +5984,8 @@ function Library:Destroy()
 end
 Library:Popup({
 	Name = "Key System", -- String
-	Text = "Copy Key Link?", -- String
+	Text = [[Copy Key Link?
+When your executor cant copy the link join my discord: https://discord.gg/vkxAThAbz6]], -- String
 	Options = {"Copy", "Close"}, -- Table
 	Callback = function(option)
 		if option == "Copy" then
