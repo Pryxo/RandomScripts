@@ -8,6 +8,8 @@ local HttpService = game:GetService("HttpService")
 local Debris = game:GetService("Debris")
 local LocalPlayer = Players.LocalPlayer
 local KeyCopy = nil
+local KeyEnteredLib = nil
+local KeySystem = {}
 local Mouse = LocalPlayer:GetMouse()
 local ConnectionBin = {}
 local ControlsConnectionBin = {}
@@ -1234,8 +1236,6 @@ function Library:Create(options)
 		StartAnimation["9e"]["Position"] = UDim2.new(0, 98, 0, 49)
 	end
 
-	local KeySystem = {}
-
 	-- Start animation
 	do
 		task.spawn(function()
@@ -1243,7 +1243,7 @@ function Library:Create(options)
 
 			Library:Tween(StartAnimation["92"], {
 				Length = 1,
-				Goal = { Size = UDim2.new(0, 310, 0, 230) },
+				Goal = { Size = UDim2.new(0, 310, 0, 230) },KeySystem
 			})
 
 			task.wait(1)
@@ -1411,10 +1411,12 @@ function Library:Create(options)
 								KeySystem.KeyTextboxHover = false
 							end)
 						)
-						local SavedKey = KeyCopy:LoadKey("VibeHubKey.txt")
+
 						if isfile("VibeHubKey.txt") then
+							local SavedKey = KeyCopy:LoadKey("VibeHubKey.txt")
 							if Gui.Key:ValidateKey("vibehub", SavedKey) then
 								print("Input Key: "..SavedKey)
+								KeyEnteredLib = SavedKey
 								KeySystem.CorrectKey = true
 							end
 						end
@@ -1422,18 +1424,11 @@ function Library:Create(options)
 							KeyConnectionBin,
 							KeySystem["a4"].FocusLost:Connect(function()
 								local keyEntered = KeySystem["a4"]["Text"]
+								KeyEnteredLib = keyEntered
 								if keyEntered ~= "" then
 									print("Input Key: "..keyEntered)
 									if Gui.Key:ValidateKey("vibehub", keyEntered)then
-										Gui.Key:SaveKey("VibeHubKey.txt",tostring(keyEntered))
 										KeySystem.CorrectKey = true
-
-										Library:ForceNotify({
-											Name = "KeySystem",
-											Text = "Correct key!",
-											Icon = "rbxassetid://11401835376",
-											Duration = 3,
-										})
 									else
 										Library:ForceNotify({
 											Name = "KeySystem",
@@ -5535,7 +5530,12 @@ function Library:Notify(options)
 		end)
 	end
 end
-
+function Library:CorrectLoading()	
+	return(KeySystem.CorrectKey)
+end
+function Library:Entered()	
+	return(KeyEnteredLib)
+end
 function Library:ForceNotify(options)
 	options = Library:PlaceDefaults({
 		Name = "Ring Ring",
