@@ -1412,14 +1412,6 @@ function Library:Create(options)
 							end)
 						)
 
-						if isfile("VibeHubKey.txt") then
-							local SavedKey = KeyCopy:LoadKey("VibeHubKey.txt")
-							if Gui.Key:ValidateKey("vibehub", SavedKey) then
-								print("Input Key: "..SavedKey)
-								KeyEnteredLib = SavedKey
-								KeySystem.CorrectKey = true
-							end
-						end
 						table.insert(
 							KeyConnectionBin,
 							KeySystem["a4"].FocusLost:Connect(function()
@@ -5535,6 +5527,9 @@ function Library:CorrectLoading()
 end
 function Library:Entered()	
 	return(KeyEnteredLib)
+end
+function Library:CorrectKey(Value)	
+	KeySystem.CorrectKey = Value
 end
 function Library:ForceNotify(options)
 	options = Library:PlaceDefaults({
