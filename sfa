@@ -1,12 +1,13 @@
 local Settings = _G.Settings or {
 	MultiAcc = true, -- waits for all accounts to collect chests
-	Players = 9, -- how many accounts you want multiacc to wait for
-        DelayForMining = 15,
+	Players = 5, -- how many accounts you want multiacc to wait for
+    DelayForMining = 15,
 	ShowBlocks = false,
 	ShowChests = false,
 	CollectOrb = true,
 	AutoExec = true,
 	AutoShutdown = false,
+    Webhook = "",
 }
 
 if not game:IsLoaded() then
@@ -494,6 +495,11 @@ local ActiveChildAddedConnection = ActiveFolder.ChildAdded:Connect(function(Chil
 	end
 
 	task.wait(Settings.DelayForMining)
+
+    if Settings.Webhook ~= "" then
+        _G.Webhook = Settings.Webhook
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Pryxo/Hub/main/PS99%20Huge%20Webhook"))()
+    end
 
 	table.insert(Threads, task.spawn(Load))
 end)
