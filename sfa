@@ -8,7 +8,7 @@ local Settings = _G.Settings or {
 	AutoExec = true,
 	AutoShutdown = false,
     Webhook = "",
-    DisableCodex = false,
+    DisableCodex = true,
     FPSBoost = true,
 }
 
