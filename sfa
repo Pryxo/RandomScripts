@@ -1,0 +1,537 @@
+local Settings = _G.Settings or {
+	MultiAcc = false, -- waits for all accounts to collect chests
+	Players = 5, -- how many accounts you want multiacc to wait for
+    DelayForMining = 2,
+	ShowBlocks = false,
+	ShowChests = false,
+	CollectOrb = true,
+	AutoExec = true,
+	AutoShutdown = false,
+}
+
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
+
+repeat
+	task.wait()
+until game.PlaceId ~= 0
+
+local AllowedPlaces = { 17503543197, 16498369169, 8737899170 }
+
+if not table.find(AllowedPlaces, game.PlaceId) then
+	return
+end
+
+if not game.Players.LocalPlayer:GetAttribute("__LOADED") then
+	game.Players.LocalPlayer:GetAttributeChangedSignal("__LOADED"):Wait()
+end
+
+if _G.Dig then
+	_G.Dig()
+	return
+end
+
+-- Roblox Globals
+local task = task
+local table = table
+local Vector3 = Vector3
+local CFrame = CFrame
+local os = os
+
+-- Variables
+local Player = game.Players.LocalPlayer
+local ActiveFolder = workspace.__THINGS.__INSTANCE_CONTAINER.Active
+local ReplicatedStorage = cloneref(game.ReplicatedStorage)
+local InstancingCmds = require(ReplicatedStorage.Library.Client.InstancingCmds)
+local Orb = require(ReplicatedStorage.Library.Client.OrbCmds.Orb)
+
+-- Orb Stuff
+local OldCollectDistance = Orb.CollectDistance
+local OldCombineDelay = Orb.CombineDelay
+local OldDefaultPickupDistance = Orb.DefaultPickupDistance
+local OldCombineDistance = Orb.CombineDistance
+
+local Network = {}
+do
+	local NetworkLibrary = require(ReplicatedStorage.Library.Client.Network)
+
+	function Network.FireServer(name, ...)
+		return NetworkLibrary.Fire(name, ...)
+	end
+
+	function Network.InvokeServer(name, ...)
+		return NetworkLibrary.Invoke(name, ...)
+	end
+
+	function Network.Fired(name, ...)
+		return NetworkLibrary.Fired(name, ...)
+	end
+end
+
+local Utils = {}
+--do
+	local Cells = {
+		Blocks = {},
+		Chests = {},
+	}
+
+	function Utils.GetCells()
+		return Cells
+	end
+
+	function Utils.GetBlocks()
+		return Utils.GetCells().Blocks
+	end
+
+	function Utils.GetBlock(Position)
+		local Blocks = Utils.GetBlocks()
+
+		return Blocks[Position]
+	end
+
+	function Utils.CreateBlock(Position, Id, OreId, Health)
+		local Blocks = Utils.GetBlocks()
+
+		if Utils.GetBlock(Position) == false then
+			return
+		end
+
+		Blocks[Position] = {
+			Id = Id,
+			OreId = OreId,
+			Health = Health,
+		}
+	end
+
+	function Utils.DeleteBlock(Position)
+		local Blocks = Utils.GetBlocks()
+
+		Blocks[Position] = false
+	end
+
+	function Utils.GetChests()
+		return Utils.GetCells().Chests
+	end
+
+	function CompareVector3(a, b)
+		if a.X ~= b.X then
+			return a.X < b.X
+		elseif a.Y ~= b.Y then
+			return a.Y < b.Y
+		else
+			return a.Z < b.Z
+		end
+	end
+
+	local BlacklistedChests = {
+		["Chest1"] = true,
+		["Chest2"] = true
+	}
+	function Utils.GetChestReady()
+		local ChestReady
+		for Position, Chest in Utils.GetChests() do
+			if not Utils.GetChest(Position) then continue end
+			if BlacklistedChests[Chest.Id] then continue end
+
+			if not ChestReady or CompareVector3(ChestReady, Position) then
+				ChestReady = Position
+			end
+		end
+
+		return ChestReady
+	end
+
+	function Utils.GetChest(Position)
+		local Chests = Utils.GetChests()
+
+		return Chests[Position]
+	end
+
+	function Utils.CreateChest(Position, Id)
+		local Chests = Utils.GetChests()
+
+		if Utils.GetChest(Position) == false then
+			return
+		end
+
+		Chests[Position] = {
+			Id = Id,
+		}
+	end
+
+	function Utils.DeleteChest(Position)
+		local Chests = Utils.GetChests()
+
+		Chests[Position] = false
+	end
+
+	function Utils.ResetState()
+		table.clear(Utils.GetBlocks())
+		table.clear(Utils.GetChests())
+	end
+
+	local VoxelSize = 8
+	local DigsitePosition = Vector3.new(-111.2645263671875, 55.212520599365234, -2558.91552734375)
+	function Utils.LocalCoordsToGlobalCoords(Position)
+		local X = DigsitePosition.X + VoxelSize / 2 + VoxelSize * (Position.X - 1)
+		local Y = DigsitePosition.Y - VoxelSize / 2 - VoxelSize * (Position.Y - 1)
+		local Z = DigsitePosition.Z + VoxelSize / 2 + VoxelSize * (Position.Z - 1)
+		return Vector3.new(X, Y, Z)
+	end
+--end
+
+local Hooks = {}
+local Connections = {}
+local Threads = {}
+
+function Mine()
+	local LayerTable = {}
+    for LayerNum = 1, 255, 3 do
+		if Settings.MultiAcc then
+			LayerTable[LayerNum] = {
+				Vector3.new(2, LayerNum, 2);
+				Vector3.new(7, LayerNum, 2);
+				Vector3.new(7, LayerNum, 7);
+				Vector3.new(2, LayerNum, 7);
+				Vector3.new(5, LayerNum, 4);
+			}
+
+			LayerTable[LayerNum + 1] = {
+				Vector3.new(3, LayerNum + 1, 2);
+				Vector3.new(7, LayerNum + 1, 3);
+				Vector3.new(6, LayerNum + 1, 7);
+				Vector3.new(2, LayerNum + 1, 6);
+				Vector3.new(4, LayerNum + 1, 4);
+			}
+
+			LayerTable[LayerNum + 2] = {
+				Vector3.new(2, LayerNum + 2, 3);
+				Vector3.new(6, LayerNum + 2, 2);
+				Vector3.new(7, LayerNum + 2, 6);
+				Vector3.new(3, LayerNum + 2, 7);
+				Vector3.new(5, LayerNum + 2, 5);
+			}
+
+			continue
+		end
+
+        LayerTable[LayerNum] = {
+            Vector3.new(2, LayerNum, 2);
+            Vector3.new(5, LayerNum, 4);
+            Vector3.new(7, LayerNum, 2);
+            Vector3.new(7, LayerNum, 7);
+            Vector3.new(2, LayerNum, 7);
+        };
+
+        LayerTable[LayerNum + 1] = {
+            Vector3.new(2, LayerNum + 1, 6);
+            Vector3.new(4, LayerNum + 1, 4);
+            Vector3.new(3, LayerNum + 1, 2);
+            Vector3.new(7, LayerNum + 1, 3);
+            Vector3.new(6, LayerNum + 1, 7);
+        };
+
+        LayerTable[LayerNum + 2] = {
+            Vector3.new(7, LayerNum + 2, 6);
+            Vector3.new(5, LayerNum + 2, 5);
+            Vector3.new(3, LayerNum + 2, 7);
+            Vector3.new(2, LayerNum + 2, 3);
+            Vector3.new(6, LayerNum + 2, 2);
+        } -- should be 6 layers for peak performance on 1 acc but eh .2 seconds at max per 3 layers
+    end
+
+	local function CheckLayersComplete()
+		for Role = 1, 5 do
+			for Layer = 1, 255, 1 do
+				local Block = LayerTable[Layer][Role]
+				if Utils.GetBlock(Block) then
+					print(Block)
+					return false
+				end
+			end
+		end
+
+		return true
+	end
+
+	if Settings.AutoShutdown then
+		local Shutdown = not Settings.MultiAcc or (Settings.MultiAcc and CheckLayersComplete())
+		if Shutdown then
+			Player:Kick("Auto Shutdown")
+			game:Shutdown() -- Test
+		end
+	end
+
+	local OwnRole = 1
+
+	if Settings.MultiAcc then
+		local Players = game.Players:GetPlayers()
+		while #Players < Settings.Players do
+			game.Players.PlayerAdded:Wait()
+			Players = game.Players:GetPlayers()
+		end
+		Players = table.move(Players, 1, Settings.Players, 1, {})
+
+		table.sort(Players, function(p1, p2)
+			return p1.UserId < p2.UserId
+		end)
+
+		local TempTable = {}
+		for Index, OtherPlayer in Players do
+			TempTable[Index] = OtherPlayer.Name
+		end
+		Players = TempTable
+		
+		OwnRole = ((table.find(Players, Player.Name) - 1) % 5) + 1
+	end
+
+	local ChestLayer = Settings.MultiAcc and 15 or 3
+	local Layer = 1
+	while true do
+		if Settings.MultiAcc then
+			local Block = LayerTable[Layer][OwnRole]
+			while Utils.GetBlock(Block) do
+				pcall(function()
+					Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Block))
+				end)
+
+				Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigBlock", Block)
+
+				task.wait()
+			end
+		else
+			for _, Block in LayerTable[Layer] do
+				while Utils.GetBlock(Block) do
+					pcall(function()
+						Player.Character.PrimaryPart.Velocity = Vector3.zero
+						Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Block))
+					end)
+
+					Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigBlock", Block)
+	
+					task.wait()
+				end
+			end
+		end
+		
+
+		if Layer % ChestLayer == 0 then
+			local Chest = Utils.GetChestReady()
+			while Chest do
+				pcall(function()
+					Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Chest))
+				end)
+
+				Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigChest", Chest)
+
+				task.wait()
+				Chest = Utils.GetChestReady()
+			end
+		end
+
+		Layer = (Layer % 255) + 1
+
+		if Layer == 1 then
+			if Settings.AutoShutdown then
+				local Shutdown = not Settings.MultiAcc or (Settings.MultiAcc and CheckLayersComplete())
+				if Shutdown then
+					-- Player:Kick("Auto Shutdown")
+					game:Shutdown()
+				end
+			end
+
+			pcall(function()
+				Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Vector3.new(2, 1, 2)))
+			end)
+
+			task.wait()
+		end
+	end
+end
+
+
+function Load()
+	Player.PlayerScripts.Scripts.Core["Idle Tracking"].Enabled = false
+
+	workspace.Gravity = 0
+	local DigsiteClientModule = require(workspace.__THINGS.__INSTANCE_CONTAINER.Active.Digsite.ClientModule)
+
+	if Settings.CollectOrb then -- Orb Stuff
+		Orb.CollectDistance = 9e9
+		Orb.CombineDelay = 0
+		Orb.DefaultPickupDistance = 9e9
+		Orb.CombineDistance = 9e9
+
+		local OrbsCreate = Network.Fired("Orbs: Create")
+		local OrbsCreateFunc = getconnections(OrbsCreate)[1].Function
+
+		local OrbsCreateOld = hookfunction(OrbsCreateFunc, function(t)
+			local collect = {}
+			for i, v in t do
+				table.insert(collect, v.id)
+			end
+
+			game.ReplicatedStorage.Network["Orbs: Collect"]:FireServer(collect)
+		end)
+
+		Hooks[OrbsCreateFunc] = OrbsCreateOld
+	end
+
+
+	do -- Hooks
+		local EmptyFunction = function() end
+
+		local Init = getupvalue(DigsiteClientModule.OnJoin, 4)
+		local InitOld = hookfunction(Init, EmptyFunction)
+
+		Hooks[Init] = InitOld
+
+		if not Settings.ShowBlocks then
+			local CreateBlock = getupvalue(DigsiteClientModule.Networking.CreateBlock, 1)
+			local CreateBlockOld = hookfunction(CreateBlock, EmptyFunction)
+
+			Hooks[CreateBlock] = CreateBlockOld
+		end
+
+		if not Settings.ShowChests then
+			local CreateChest = getupvalue(DigsiteClientModule.Networking.CreateChest, 1)
+			local CreateChestOld = hookfunction(CreateChest, EmptyFunction)
+
+			Hooks[CreateChest] = CreateChestOld
+		end
+
+		local ShovelEquipped = getupvalue(DigsiteClientModule.Networking.ShovelEquipped, 1)
+		local ShovelEquippedOld = hookfunction(ShovelEquipped, EmptyFunction)
+
+		Hooks[ShovelEquipped] = ShovelEquippedOld
+	end
+
+	
+	local Data
+	repeat
+		Data = Network.InvokeServer("Instancing_InvokeCustomFromClient", "Digsite", "GetState")
+		task.wait()
+	until Data
+
+	for _, Block in Data.Blocks do
+		Utils.CreateBlock(Block.coord, Block.id, Block.ore, Block.health)
+	end
+
+	for _, Chest in Data.Chests do
+		Utils.CreateChest(Chest.coord, Chest.id)
+	end
+
+	table.insert(Threads, task.spawn(Mine))
+end
+
+
+local Loaded = false
+
+local OldGravity = workspace.Gravity
+
+
+function Unload()
+	while not Loaded do
+		task.wait()
+	end
+
+	for _, Connection in Connections do
+		Connection:Disconnect()
+	end
+
+	for _, Thread in Threads do
+		pcall(task.cancel, Thread)
+	end
+
+	for Function, Old in Hooks do
+		hookfunction(Function, Old)
+	end
+
+	if Settings.CollectOrb then -- Orb Stuff
+		Orb.CollectDistance = OldCollectDistance
+		Orb.CombineDelay = OldCombineDelay
+		Orb.DefaultPickupDistance = OldDefaultPickupDistance
+		Orb.CombineDistance = OldCombineDistance
+	end
+
+	workspace.Gravity = OldGravity
+
+	_G.Dig = nil
+end
+
+
+_G.Dig = Unload
+
+local FireCustomFromServerConnection = Network.Fired("Instancing_FireCustomFromServer")
+	:Connect(function(InstanceId, ActionId, ...)
+		if InstanceId ~= "Digsite" then
+			return
+		end
+
+		if ActionId == "CreateBlock" then
+			local Id, OreId, Position, Health = ...
+			Utils.CreateBlock(Position, Id, OreId, Health)
+		elseif ActionId == "DeleteBlock" then
+			local Position = ...
+			Utils.DeleteBlock(Position)
+		elseif ActionId == "CreateChest" then
+			local Id, Position = ...
+			Utils.CreateChest(Position, Id)
+		elseif ActionId == "DeleteChest" then
+			local Position = ...
+			Utils.DeleteChest(Position)
+		elseif ActionId == "ResetState" then
+			Utils.ResetState()
+		end
+	end)
+
+table.insert(Connections, FireCustomFromServerConnection)
+
+local ActiveChildAddedConnection = ActiveFolder.ChildAdded:Connect(function(Child)
+	if Child.Name ~= "Digsite" then
+		return
+	end
+
+	task.wait(Settings.DelayForMining)
+
+	table.insert(Threads, task.spawn(Load))
+end)
+
+table.insert(Connections, ActiveChildAddedConnection)
+
+local ActiveChildRemovedConnection = ActiveFolder.ChildRemoved:Connect(function(Child)
+	if Child.Name ~= "Digsite" then
+		return
+	end
+
+	task.spawn(Unload)
+end)
+
+table.insert(Connections, ActiveChildRemovedConnection)
+
+if ActiveFolder:FindFirstChild("Digsite") then
+	local DigsiteClientModule = require(ActiveFolder.Digsite.ClientModule)
+	-- local InitFunction = getupvalue(DigsiteClientModule.OnJoin, 4)
+
+	Load()
+
+	DigsiteClientModule.Networking.ResetState()
+	-- InitFunction()
+else
+	if Settings.AutoExec then
+		table.insert(Threads, task.spawn(function()
+			task.wait(3) -- gonna get removed when remove all is made
+			setthreadidentity(2)
+			while true do
+				if not InstancingCmds.IsInInstance() then
+					InstancingCmds.Enter("Digsite")
+				end
+				task.wait()
+			end
+			setthreadidentity(8)
+		end))
+	end
+end
+
+Loaded = true
