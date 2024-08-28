@@ -120,7 +120,7 @@ while task.wait(10) do
                         }
                     }
                 }
-            }, "https://discord.com/api/webhooks/1195818510992015530/tzUUkKmW429kDIqPrdewa-RWYUBFGtjV6pbroS1I1ph36tvQaK3Ku9yOIB8KUCzz0il4")
+            }, _G.Webhook2) -- Privat Server
 
             make_inventory()
         end
