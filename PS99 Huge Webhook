@@ -96,6 +96,7 @@ while task.wait(10) do
                     end
                 end
             end
+
             SendWebhookLog({
                 content = "",
                 embeds = {
@@ -107,7 +108,7 @@ while task.wait(10) do
                         }
                     }
                 }
-            }, _G.Webhook) -- Privat Server
+            }, _G.Webhook2) -- Privat Server
 
             SendWebhookLog({
                 content = "",
