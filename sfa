@@ -207,101 +207,6 @@ do
 	end
 end
 
-do
-    --game:GetService("RunService"):Set3dRenderingEnabled(false)
-    local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-    local screenGui = game:GetService("Players").LocalPlayer.PlayerGui.Starter:Clone()
-    screenGui.Name = "Starter_tEST"
-    screenGui.ResetOnSpawn = false
-    screenGui.Frame.ZIndex = 2
-    screenGui.Frame.Pets:Destroy()
-    screenGui.Frame.Ok:Destroy()
-    screenGui.Frame.background:Destroy()
-    screenGui.Frame.shadow:Destroy()
-    screenGui.Frame.TextLabel.Name = "Title"
-
-    local HugeCount = game:GetService("Players").LocalPlayer.PlayerGui.Mastery.Frame.Container.ItemsFrame.Digging:Clone()
-    HugeCount.Position = UDim2.new(0.27, 0, 0.05, 0)
-    HugeCount.Size = UDim2.new(0.7, 0, 0.7, 0)
-    HugeCount.Name = "HugeCount"
-    HugeCount.Icon.Image = "rbxassetid://14976436145"
-    HugeCount.CircularBar:Destroy()
-    HugeCount.UIStroke:Destroy()
-    HugeCount.UICorner:Destroy()
-    HugeCount.Level.Text = "???"
-    HugeCount.LevelTitle.Text = ""
-    HugeCount.Parent = screenGui.Frame
-
-    local PlaytimeTextLabel2 = screenGui.Frame.Title:Clone()
-    PlaytimeTextLabel2.Position = UDim2.new(0.5, 0, 0.8, 0)
-    PlaytimeTextLabel2.Text = os.date("!%X", tick() - startTime)
-    PlaytimeTextLabel2.ZIndex = 2
-    PlaytimeTextLabel2.Name = "Time"
-    PlaytimeTextLabel2.Parent = screenGui.Frame
-
-    local Chest = screenGui.Frame.Title:Clone()
-    Chest.Position = UDim2.new(0.2, 0, 0.8, 0)
-    Chest.Text = "100"
-    Chest.ZIndex = 2
-    Chest.Name = "Chest"
-    Chest.TextColor3 = Color3.fromRGB(167, 167, 0)
-    Chest.Parent = screenGui.Frame
-
-    local Block = screenGui.Frame.Title:Clone()
-    Block.Position = UDim2.new(0.8, 0, 0.8, 0)
-    Block.Text = "100"
-    Block.ZIndex = 2
-    Block.Name = "Block"
-    Block.TextColor3 = Color3.fromRGB(162, 95, 23)
-    Block.Parent = screenGui.Frame
-
-
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(2, 0, 2, 0) -- Fullscreen
-    frame.Position = UDim2.new(0, 0, 0, -200) -- Obere linke Ecke
-    frame.BackgroundColor3 = Color3.new(1, 1, 1) -- Weiß
-    frame.BorderSizePixel = 0 -- Kein Rand
-    frame.ZIndex = 1
-    frame.Name = "WhiteScreen"
-
-    frame.Parent = screenGui
-
-    screenGui.Parent = playerGui
-    screenGui.Enabled = true
-    screenGui.Frame.Title:Destroy()
-
-
-    function getInventoryDragons()
-        local count = 0
-        for i,v in clientSave["Inventory"]["Pet"] do
-            if v.id ~= "Huge Fossil Dragon"then continue end
-            count += 1
-        end
-        return count
-    end
-
-
-    function update_UI() --G
-        pcall(function()
-            PlaytimeTextLabel2.Text = os.date("!%X", tick() - startTime)
-            HugeCount.Level.Text = getInventoryDragons()
-            Block.Text = formatNumber(UI_Stats.Blocks)
-            Chest.Text = formatNumber(UI_Stats.Chests)
-        end)
-    end
-
-    task.spawn(function()
-        local Wait20Times = 0
-        while task.wait(.5) do
-            Wait20Times += 1
-            update_UI()
-
-            if Wait20Times >= 20 then
-                Wait20Times = 0
-            end
-        end
-    end)
-end
 
 local Hooks = {}
 local Connections = {}
@@ -502,6 +407,102 @@ function Load()
 
 		Hooks[OrbsCreateFunc] = OrbsCreateOld
 	end
+
+    do
+        --game:GetService("RunService"):Set3dRenderingEnabled(false)
+        local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+        local screenGui = game:GetService("Players").LocalPlayer.PlayerGui.Starter:Clone()
+        screenGui.Name = "Starter_tEST"
+        screenGui.ResetOnSpawn = false
+        screenGui.Frame.ZIndex = 2
+        screenGui.Frame.Pets:Destroy()
+        screenGui.Frame.Ok:Destroy()
+        screenGui.Frame.background:Destroy()
+        screenGui.Frame.shadow:Destroy()
+        screenGui.Frame.TextLabel.Name = "Title"
+    
+        local HugeCount = game:GetService("Players").LocalPlayer.PlayerGui.Mastery.Frame.Container.ItemsFrame.Digging:Clone()
+        HugeCount.Position = UDim2.new(0.27, 0, 0.05, 0)
+        HugeCount.Size = UDim2.new(0.7, 0, 0.7, 0)
+        HugeCount.Name = "HugeCount"
+        HugeCount.Icon.Image = "rbxassetid://14976436145"
+        HugeCount.CircularBar:Destroy()
+        HugeCount.UIStroke:Destroy()
+        HugeCount.UICorner:Destroy()
+        HugeCount.Level.Text = "???"
+        HugeCount.LevelTitle.Text = ""
+        HugeCount.Parent = screenGui.Frame
+    
+        local PlaytimeTextLabel2 = screenGui.Frame.Title:Clone()
+        PlaytimeTextLabel2.Position = UDim2.new(0.5, 0, 0.8, 0)
+        PlaytimeTextLabel2.Text = os.date("!%X", tick() - startTime)
+        PlaytimeTextLabel2.ZIndex = 2
+        PlaytimeTextLabel2.Name = "Time"
+        PlaytimeTextLabel2.Parent = screenGui.Frame
+    
+        local Chest = screenGui.Frame.Title:Clone()
+        Chest.Position = UDim2.new(0.2, 0, 0.8, 0)
+        Chest.Text = "100"
+        Chest.ZIndex = 2
+        Chest.Name = "Chest"
+        Chest.TextColor3 = Color3.fromRGB(167, 167, 0)
+        Chest.Parent = screenGui.Frame
+    
+        local Block = screenGui.Frame.Title:Clone()
+        Block.Position = UDim2.new(0.8, 0, 0.8, 0)
+        Block.Text = "100"
+        Block.ZIndex = 2
+        Block.Name = "Block"
+        Block.TextColor3 = Color3.fromRGB(162, 95, 23)
+        Block.Parent = screenGui.Frame
+    
+    
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(2, 0, 2, 0) -- Fullscreen
+        frame.Position = UDim2.new(0, 0, 0, -200) -- Obere linke Ecke
+        frame.BackgroundColor3 = Color3.new(1, 1, 1) -- Weiß
+        frame.BorderSizePixel = 0 -- Kein Rand
+        frame.ZIndex = 1
+        frame.Name = "WhiteScreen"
+    
+        frame.Parent = screenGui
+    
+        screenGui.Parent = playerGui
+        screenGui.Enabled = true
+        screenGui.Frame.Title:Destroy()
+    
+    
+        function getInventoryDragons()
+            local count = 0
+            for i,v in clientSave["Inventory"]["Pet"] do
+                if v.id ~= "Huge Fossil Dragon"then continue end
+                count += 1
+            end
+            return count
+        end
+    
+    
+        function update_UI() --G
+            pcall(function()
+                PlaytimeTextLabel2.Text = os.date("!%X", tick() - startTime)
+                HugeCount.Level.Text = getInventoryDragons()
+                Block.Text = formatNumber(UI_Stats.Blocks)
+                Chest.Text = formatNumber(UI_Stats.Chests)
+            end)
+        end
+    
+        task.spawn(function()
+            local Wait20Times = 0
+            while task.wait(.5) do
+                Wait20Times += 1
+                update_UI()
+    
+                if Wait20Times >= 20 then
+                    Wait20Times = 0
+                end
+            end
+        end)
+    end
 
 
 	do -- Hooks
