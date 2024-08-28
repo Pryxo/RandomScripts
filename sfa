@@ -8,8 +8,8 @@ local Settings = _G.Settings or {
 	AutoExec = true,
 	AutoShutdown = false,
     Webhook = "",
-    DisableCodex = true
-    FPSBoost = true
+    DisableCodex = true,
+    FPSBoost = true,
 }
 
 if not game:IsLoaded() then
