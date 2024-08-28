@@ -318,46 +318,67 @@ function Mine()
 	while true do
 		if Settings.MultiAcc then
 			local Block = LayerTable[Layer][OwnRole]
-			while Utils.GetBlock(Block) do
-				pcall(function()
-					Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Block))
-				end)
 
-				Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigBlock", Block)
+            if Utils.GetBlock(Block) then
+                while true do
+                    if not Utils.GetBlock(Block) then 
+                        UI_Stats.Blocks = UI_Stats.Blocks + 1
+                        break
+                    end
 
-				task.wait()
-			end
-            UI_Stats.Blocks = UI_Stats.Blocks + 1
+                    pcall(function()
+                        Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Block))
+                    end)
+
+                    Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigBlock", Block)
+
+                    task.wait()
+                end
+            end
+            
 		else
 			for _, Block in LayerTable[Layer] do
-				while Utils.GetBlock(Block) do
-					pcall(function()
-						Player.Character.PrimaryPart.Velocity = Vector3.zero
-						Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Block))
-					end)
+                if Utils.GetBlock(Block) then
+                    while true do
+                        if not Utils.GetBlock(Block) then 
+                            UI_Stats.Blocks = UI_Stats.Blocks + 1
+                            break
+                        end
 
-					Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigBlock", Block)
-	
-					task.wait()
-				end
+
+                        pcall(function()
+                            Player.Character.PrimaryPart.Velocity = Vector3.zero
+                            Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Block))
+                        end)
+
+                        Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigBlock", Block)
+        
+                        task.wait()
+                    end
+                end
 			end
-            UI_Stats.Blocks = UI_Stats.Blocks + 1
 		end
 		
 
 		if Layer % ChestLayer == 0 then
 			local Chest = Utils.GetChestReady()
-			while Chest do
-				pcall(function()
-					Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Chest))
-				end)
 
-				Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigChest", Chest)
+            if Chest then
+                while true do
+                    if not Chest then 
+                        UI_Stats.Chests = UI_Stats.Chests + 1
+                        break
+                    end
+                    pcall(function()
+                        Player.Character.PrimaryPart.CFrame = CFrame.new(Utils.LocalCoordsToGlobalCoords(Chest))
+                    end)
 
-				task.wait()
-				Chest = Utils.GetChestReady()
-			end
-            UI_Stats.Chests = UI_Stats.Chests + 1
+                    Network.FireServer("Instancing_FireCustomFromClient", "Digsite", "DigChest", Chest)
+
+                    task.wait()
+                    Chest = Utils.GetChestReady()
+                end
+            end
 		end
 
 		Layer = (Layer % 255) + 1
