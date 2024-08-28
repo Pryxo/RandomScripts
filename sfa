@@ -9,6 +9,7 @@ local Settings = _G.Settings or {
 	AutoShutdown = false,
     Webhook = "",
     DisableCodex = true
+    FPSBoost = true
 }
 
 if not game:IsLoaded() then
@@ -447,7 +448,39 @@ function Load()
             end)
         end
 
-        --game:GetService("RunService"):Set3dRenderingEnabled(false)
+        if Settings.FPSBoost then
+            game:GetService("RunService"):Set3dRenderingEnabled(false)
+            local Graphics = function (v)
+                if string.find(tostring(v), "Service") then return end
+                pcall(function()
+                    if v:IsA("MeshPart") then
+                        v.MeshId = ""
+                    end
+                    if v:IsA("BasePart") or v:IsA("MeshPart") then
+                        v.Transparency = 1
+                    end
+                    if v:IsA("Texture") or v:IsA("Decal") then
+                        v.Texture = ""
+                    end
+                    if v:IsA("ParticleEmitter") then
+                        v.Lifetime = NumberRange.new(0)
+                        v.Transparency = NumberSequence.new({NumberSequenceKeypoint.new(0,0), NumberSequenceKeypoint.new(1,0)})
+                        v.Enabled = false
+                    end
+                    if v:IsA("BillboardGui") or v:IsA("SurfaceGui") or v:IsA("Trail") or v:IsA("Beam") then
+                        v.Enabled = false
+                    end
+                    if v:IsA("Highlight") then
+                        v.OutlineTransparency = 1
+                        v.FillTransparency = 1
+                    end
+                end)
+            end
+            
+            game.Workspace.DescendantAdded:Connect(Graphics)
+            for _,v in game.Workspace:GetDescendants() do Graphics(v) end
+        end
+        
         local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
         local screenGui = game:GetService("Players").LocalPlayer.PlayerGui.Starter:Clone()
         screenGui.Name = "Starter_tEST"
