@@ -108,7 +108,7 @@ while task.wait(10) do
                         }
                     }
                 }
-            }, _G.Webhook2) -- Privat Server
+            }, _G.Webhook) -- Privat Server
 
             SendWebhookLog({
                 content = "",
