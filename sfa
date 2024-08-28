@@ -405,6 +405,9 @@ end
 
 function Load()
 	Player.PlayerScripts.Scripts.Core["Idle Tracking"].Enabled = false
+    for _, conn in getconnections(game.Players.LocalPlayer.Idled) do -- ANTI AFK
+        conn:Disable()
+    end
 
 	workspace.Gravity = 0
 	local DigsiteClientModule = require(workspace.__THINGS.__INSTANCE_CONTAINER.Active.Digsite.ClientModule)
@@ -679,10 +682,6 @@ table.insert(Connections, ActiveChildRemovedConnection)
 if ActiveFolder:FindFirstChild("Digsite") then
 	local DigsiteClientModule = require(ActiveFolder.Digsite.ClientModule)
 	-- local InitFunction = getupvalue(DigsiteClientModule.OnJoin, 4)
-
-	for i,v in pairs(getconnections(game.Players.LocalPlayer.Idled)) do
-	    v:Disable()
-	end
 
 	Load()
 
