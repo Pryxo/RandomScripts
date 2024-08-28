@@ -514,6 +514,10 @@ if ActiveFolder:FindFirstChild("Digsite") then
 	local DigsiteClientModule = require(ActiveFolder.Digsite.ClientModule)
 	-- local InitFunction = getupvalue(DigsiteClientModule.OnJoin, 4)
 
+	for i,v in pairs(getconnections(game.Players.LocalPlayer.Idled)) do
+	    v:Disable()
+	end
+
 	Load()
 
 	DigsiteClientModule.Networking.ResetState()
