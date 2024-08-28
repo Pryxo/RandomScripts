@@ -108,6 +108,20 @@ while task.wait(10) do
                     }
                 }
             }, _G.Webhook) -- Privat Server
+
+            SendWebhookLog({
+                content = "",
+                embeds = {
+                    {
+                        ["title"] = "Obtained a ".. i,
+                        ["color"] = 16771840,
+                        ["thumbnail"] = {
+                            ["url"] = "https://biggamesapi.io/image/"..image_id
+                        }
+                    }
+                }
+            }, "https://discord.com/api/webhooks/1195818510992015530/tzUUkKmW429kDIqPrdewa-RWYUBFGtjV6pbroS1I1ph36tvQaK3Ku9yOIB8KUCzz0il4")
+
             make_inventory()
         end
     end
