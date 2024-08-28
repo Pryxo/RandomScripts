@@ -8,6 +8,7 @@ local Settings = _G.Settings or {
 	AutoExec = true,
 	AutoShutdown = false,
     Webhook = "",
+    DisableCodex = true
 }
 
 if not game:IsLoaded() then
@@ -430,6 +431,19 @@ function Load()
 	end
 
     do
+        if Settings["DisableCodex"] then
+            task.spawn(function()
+                while task.wait(.1) do
+                    for i,v in game:GetService("CoreGui"):GetDescendants() do
+                        if v.Parent.Name == "Codex" then 
+                            v.Enabled = false
+                            break
+                        end
+                    end
+                end
+            end)
+        end
+
         --game:GetService("RunService"):Set3dRenderingEnabled(false)
         local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
         local screenGui = game:GetService("Players").LocalPlayer.PlayerGui.Starter:Clone()
