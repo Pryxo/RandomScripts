@@ -1,14 +1,14 @@
 local Settings = _G.Settings or {
 	MultiAcc = true, -- waits for all accounts to collect chests
 	Players = 3, -- how many accounts you want multiacc to wait for
-    DelayForMining = 15,
+    DelayForMining = 2,
 	ShowBlocks = false,
 	ShowChests = false,
 	CollectOrb = true,
 	AutoExec = true,
 	AutoShutdown = false,
     Webhook = "",
-    DisableCodex = true,
+    DisableCodex = false,
     FPSBoost = true,
 }
 
@@ -449,7 +449,6 @@ function Load()
         end
 
         if Settings.FPSBoost then
-            game:GetService("RunService"):Set3dRenderingEnabled(false)
             local Graphics = function (v)
                 if string.find(tostring(v), "Service") then return end
                 pcall(function()
@@ -733,6 +732,8 @@ else
 				task.wait()
 			end
 			setthreadidentity(8)
+
+
 		end))
 	end
 end
