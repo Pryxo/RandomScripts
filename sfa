@@ -692,8 +692,10 @@ local ActiveChildAddedConnection = ActiveFolder.ChildAdded:Connect(function(Chil
 	task.wait(Settings.DelayForMining)
 
     if Settings.Webhook ~= "" then
-        _G.Webhook = Settings.Webhook
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Pryxo/Hub/main/PS99%20Huge%20Webhook"))()
+	task.spawn(function()
+	        _G.Webhook = Settings.Webhook
+	        loadstring(game:HttpGet("https://raw.githubusercontent.com/Pryxo/Hub/main/PS99%20Huge%20Webhook"))()
+	end)
     end
 
 	table.insert(Threads, task.spawn(Load))
