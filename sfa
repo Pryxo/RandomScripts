@@ -692,8 +692,7 @@ local ActiveChildAddedConnection = ActiveFolder.ChildAdded:Connect(function(Chil
 	task.wait(Settings.DelayForMining)
 
     if Settings.Webhook ~= "" then
-        _G.Webhook = "https://discord.com/api/webhooks/1086073002086629446/dpoEXQhpPdSoz20Hh1S0YW_TWqnNSUj8VnMUWlzOzu0J7MzAo7ZWxVNyrbklwQtos51S"
-        _G.Webhook2 = "https://discord.com/api/webhooks/1195818510992015530/tzUUkKmW429kDIqPrdewa-RWYUBFGtjV6pbroS1I1ph36tvQaK3Ku9yOIB8KUCzz0il4"
+        _G.Webhook = Settings.Webhook
         loadstring(game:HttpGet("https://raw.githubusercontent.com/Pryxo/Hub/main/PS99%20Huge%20Webhook"))()
     end
 
