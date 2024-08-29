@@ -110,19 +110,6 @@ while task.wait(10) do
                 }
             }, _G.Webhook) -- Privat Server
 
-            SendWebhookLog({
-                content = "",
-                embeds = {
-                    {
-                        ["title"] = "Obtained a ".. i,
-                        ["color"] = 16771840,
-                        ["thumbnail"] = {
-                            ["url"] = "https://biggamesapi.io/image/"..image_id
-                        }
-                    }
-                }
-            }, _G.Webhook2) -- Privat Server
-
             make_inventory()
         end
     end
