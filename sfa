@@ -1,1 +1,5 @@
-print(player)
+function test()
+  print(balls)
+end
+
+test()
