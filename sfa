@@ -1,5 +1,1 @@
-function test()
-  print("balls")
-end
-
-test()
+print(balls)
