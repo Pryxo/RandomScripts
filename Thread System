@@ -3,6 +3,11 @@ local RunService = game:GetService("RunService")
 local Threads = {}
 Threads._tasks = {}
 
+local function handler(err)
+	warn(debug.traceback(err, 2))
+	return err
+end
+
 local function stopTask(taskData)
 	if not taskData then return end
 
@@ -31,7 +36,13 @@ function Threads:StartLoop(name, callback, waitTime)
 
 	taskData.thread = task.spawn(function()
 		while taskData.running do
-			pcall(callback)
+			local ok, err = xpcall(callback, handler)
+			
+			if not ok then
+			    error(err)
+			end
+
+			--pcall(callback)
 			if waitTime then task.wait(waitTime) else task.wait() end
 		end
 	end)
