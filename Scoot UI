@@ -74,7 +74,7 @@ local Library do
 
         Folders = {
             Directory = "scoot",
-            Configs = "scoot/Configs",
+            Configs = "scoot/Configs/"..game.GameId,
             Assets = "scoot/Assets",
         },
 
