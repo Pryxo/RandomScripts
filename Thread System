@@ -1,0 +1,94 @@
+local RunService = game:GetService("RunService")
+
+local Threads = {}
+Threads._tasks = {}
+
+local function stopTask(taskData)
+	if not taskData then return end
+
+	taskData.running = false
+
+	if taskData.connection then
+		taskData.connection:Disconnect()
+		taskData.connection = nil
+	end
+
+	if taskData.thread then
+		task.cancel(taskData.thread)
+		taskData.thread = nil
+	end
+end
+
+function Threads:IsRunning(name)
+	local t = self._tasks[name]
+	return t and t.running == true
+end
+
+function Threads:StartLoop(name, callback, waitTime)
+	if self:IsRunning(name) then return false end
+
+	local taskData = { running = true }
+
+	taskData.thread = task.spawn(function()
+		while taskData.running do
+			pcall(callback)
+			if waitTime then task.wait(waitTime) else task.wait() end
+		end
+	end)
+
+	self._tasks[name] = taskData
+	return true
+end
+
+function Threads:StartHeartbeat(name, callback)
+	if self:IsRunning(name) then return false end
+
+	local taskData = { running = true }
+
+	taskData.connection = RunService.Heartbeat:Connect(function(dt)
+		if not taskData.running then return end
+		pcall(callback, dt)
+	end)
+
+	self._tasks[name] = taskData
+	return true
+end
+
+function Threads:RunOnce(name, callback)
+	if self._tasks[name] then
+		taskData = self._tasks[name]
+		taskData.running = false
+	end
+
+	local taskData = { running = true }
+
+	taskData.thread = task.spawn(function()
+		pcall(callback)
+		taskData.running = false
+		Threads._tasks[name] = nil
+	end)
+
+	self._tasks[name] = taskData
+end
+
+function Threads:Stop(name)
+	local taskData = self._tasks[name]
+	if not taskData then return end
+
+	taskData.running = false
+	if taskData.connection then taskData.connection:Disconnect() end
+	if taskData.thread then task.cancel(taskData.thread) end
+
+	self._tasks[name] = nil
+end
+
+function Threads:StopAll()
+	for name, taskData in pairs(self._tasks) do
+		taskData.running = false
+		if taskData.connection then taskData.connection:Disconnect() end
+		if taskData.thread then task.cancel(taskData.thread) end
+		self._tasks[name] = nil
+	end
+end
+
+return Threads
